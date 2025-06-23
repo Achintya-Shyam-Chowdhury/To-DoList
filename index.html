@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>To-DoList</title>
+    <!-- <link rel="stylesheet" href="style.css" /> -->
+    <!-- <script src="script.js" defer></script> -->
+    <style>
+        * {
+            transition: background-color 0.5s, color 0.5s linear;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+
+        #dst {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 2rem;
+        }
+
+        .button-container {
+            margin: 20px 0;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .main-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 20px;
+            gap: 30px;
+        }
+
+        .pending {
+            width: 50vw;
+            height: 75vh;
+            border: 2px solid black;
+            overflow: auto;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 10px;
+        }
+
+        .descBox {
+            width: 40vw;
+            height: 75vh;
+            border: 2px solid black;
+            border-radius: 10px;
+            background-color: #fafafa;
+            padding: 10px;
+        }
+
+        .descriptionTarget {
+            display: none;
+            padding: 15px;
+            font-size: 1.1rem;
+            line-height: 1.4;
+            color: #444;
+            white-space: pre-wrap;
+        }
+
+        ul li {
+            list-style-type: decimal;
+            background-color: #f4f4f4;
+            padding: 10px;
+            margin-bottom: 6px;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        ul li:hover {
+            background-color: #e0e0e0;
+        }
+
+        ul li span {
+            cursor: pointer;
+            margin-left: 8px;
+            padding: 2px 5px;
+            border-radius: 4px;
+            background-color: #eee;
+            transition: background-color 0.2s;
+        }
+
+        .targetDone:hover {
+            background-color: #d4f4d4;
+        }
+
+        .targetDesc:hover {
+            background-color: #d4e4ff;
+        }
+
+        .clearTarget:hover {
+            background-color: #ffd6d6;
+        }
+
+        .input-box {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 10px 20px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .input-box input {
+            padding: 8px 10px;
+            font-size: 1rem;
+            border: 1px solid #aaa;
+            border-radius: 6px;
+        }
+
+        #submitTask {
+            padding: 8px 10px;
+            background-color: #28a745;
+            border: none;
+            color: white;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #submitTask:hover {
+            background-color: #1f883d;
+        }
+
+        ul li p {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 id="dst">To-Do List.</h1>
+
+
+    <div class="button-container">
+        <div class="input-box">
+            <input type="text" id="taskInput" placeholder="Task name..." />
+            <input type="text" id="descInput" placeholder="Description..." />
+            <button id="submitTask">➕ Submit</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="pending">
+            <h1>To-Do List</h1>
+            <ul class="ulTarget">
+
+            </ul>
+        </div>
+
+        <div class="descBox">
+            <p class="descriptionTarget"></p>
+        </div>
+    </div>
+
+
+    <script src="ColorChange.js"></script>
+    <script>
+        function sortList() {
+            let arr1 = [];
+            let arr2 = [];
+            for (const li of ul.children) {
+                let splitted = li.textContent.split("-");
+                if (splitted[2]?.trim() === "⛔") {
+                    arr1.push(li);
+                } else {
+                    arr2.push(li);
+                }
+            }
+
+            while (ul.firstChild) {
+                ul.removeChild(ul.firstChild);
+            }
+            [...arr1, ...arr2].forEach(li => ul.appendChild(li))
+
+        }
+
+
+
+        let submit = document.getElementById("submitTask")
+
+        let datetime = new Date();
+        let targetSpan = document.getElementsByClassName("targetDone")[0];
+        let descriptionTarget = document.getElementsByClassName("descriptionTarget")[0]
+        let ul = document.getElementsByTagName("ul")[0];
+
+        ul.addEventListener("click", (event) => {
+            if (event.target.classList.contains("targetDone")) {
+                let donetext = event.target.parentElement.textContent.split("-")
+                event.target.parentElement.innerHTML = `<strong>${donetext[0]}</strong> - ${donetext[1]} -<span class="targetDone"> ✅</span>-<span class="targetDesc"> Description</span>-<span class="clearTarget"> 🗑 </span>- ${datetime.toLocaleTimeString()} <p>${event.target.parentElement.querySelector('p').textContent}</p>`
+                sortList()
+            }
+            if (event.target.classList.contains("targetDesc")) {
+                console.log("targetDesc fired!!")
+                let descParent = event.target.parentElement
+                let desc = descParent.querySelector("p").textContent;
+                document.getElementsByClassName("descriptionTarget")[0].textContent = desc;
+                document.getElementsByClassName("descriptionTarget")[0].style.display = "block";
+
+            }
+            if (event.target.classList.contains("clearTarget")) {
+                event.target.parentElement.remove()
+            }
+        })
+
+        submit.addEventListener("click", () => {
+            if (document.getElementById('taskInput')) {
+
+                let buzz = document.createElement("li");
+                let descElement = document.createElement("p")
+                descElement.textContent = document.getElementById('descInput').value
+                buzz.innerHTML = `<strong>${document.getElementById('taskInput').value}</strong> - ${datetime.toLocaleTimeString()} -<span class="targetDone"> ⛔</span>-<span class="targetDesc"> Description</span>-<span class="clearTarget"> 🗑 </span>`;
+                ul.appendChild(buzz);
+                buzz.appendChild(descElement)
+                sortList();
+            }
+        })
+    </script>
+</body>
+
+</html>
